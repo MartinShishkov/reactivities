@@ -1,12 +1,11 @@
 import React from 'react';
 import { Button, Container, Menu } from 'semantic-ui-react';
+import { useStore } from '../stores/store';
+import { observer } from 'mobx-react-lite';
 
-type NavBarProps = {
-  onOpenForm: () => void;
-};
+const NavBar:React.FC = () => {
+  const { activityStore } = useStore();
 
-const NavBar:React.FC<NavBarProps> = ({ onOpenForm }) => {
-  
   return (
     <Menu inverted fixed='top'>
       <Container>
@@ -15,11 +14,11 @@ const NavBar:React.FC<NavBarProps> = ({ onOpenForm }) => {
         </Menu.Item>
         <Menu.Item name='Activities'/>
         <Menu.Item>
-          <Button positive content='Create Activity' onClick={onOpenForm} />
+          <Button positive content='Create Activity' onClick={() => activityStore.openForm()} />
         </Menu.Item>
       </Container>
     </Menu>
   );
 }
 
-export default NavBar;
+export default observer(NavBar);

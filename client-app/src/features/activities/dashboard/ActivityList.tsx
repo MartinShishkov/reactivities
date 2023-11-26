@@ -1,20 +1,17 @@
 import React, { SyntheticEvent, useState } from 'react';
 import { Button, Item, Label, Segment } from 'semantic-ui-react';
-import { Activity } from '../../../app/models/activity';
+import { useStore } from '../../../app/stores/store';
+import { observer } from 'mobx-react-lite';
 
-type ActivityListProps = {
-  activities: Activity[];
-  blockUi: boolean;
-  onSelect: (id: string) => void;
-  onDelete: (id: string) => void;
-};
+const ActivityList: React.FC = () => {
+  const { activityStore } = useStore();
+  const { activities, loading, selectActivity, deleteActivity } = activityStore;
 
-const ActivityList:React.FC<ActivityListProps> = ({ activities, blockUi, onSelect, onDelete }) => {
   const [target, setTarget] = useState('');
 
   const handleDelete = (e: SyntheticEvent<HTMLButtonElement>, id: string) => {
     setTarget(e.currentTarget.name);
-    onDelete(id);
+    deleteActivity(id);
   };
 
   return (
@@ -34,8 +31,8 @@ const ActivityList:React.FC<ActivityListProps> = ({ activities, blockUi, onSelec
                 <div>{activity.city}, {activity.venue}</div>
               </Item.Description>
               <Item.Extra>
-                <Button floated='right' content='View' color='blue' onClick={() => onSelect(activity.id)} />
-                <Button name={activity.id} loading={blockUi && target === activity.id} floated='right' content='Delete' color='red' onClick={(e) => handleDelete(e, activity.id)} />
+                <Button floated='right' content='View' color='blue' onClick={() => selectActivity(activity.id)} />
+                <Button name={activity.id} loading={loading && target === activity.id} floated='right' content='Delete' color='red' onClick={(e) => handleDelete(e, activity.id)} />
                 <Label basic content={activity.category} />
               </Item.Extra>
             </Item.Content>
@@ -46,4 +43,4 @@ const ActivityList:React.FC<ActivityListProps> = ({ activities, blockUi, onSelec
     
   );
 }
-export default ActivityList;
+export default observer(ActivityList);

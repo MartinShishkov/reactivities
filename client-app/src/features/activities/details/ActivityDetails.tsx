@@ -1,15 +1,15 @@
 import React from 'react';
 import { Button, Card, Image } from 'semantic-ui-react';
-import { Activity } from '../../../app/models/activity';
+import { useStore } from '../../../app/stores/store';
 
-type ActivityDetailsProps = {
-  activity: Activity;
-  onEdit: (id: string) => void;
-  onCancel: () => void;
-};
+const ActivityDetails: React.FC = () => {
+  const { activityStore } = useStore();
+  const { selectedActivity: activity, clearSelectedActivity, openForm } = activityStore;
 
-const ActivityDetails:React.FC<ActivityDetailsProps> = ({ activity, onEdit, onCancel }) => {
-  
+  if (!activity) {
+    return null;
+  }
+
   return (
     <Card fluid>
       <Image src={`/assets/categoryImages/${activity.category}.jpg`} wrapped ui={false} />
@@ -24,8 +24,8 @@ const ActivityDetails:React.FC<ActivityDetailsProps> = ({ activity, onEdit, onCa
       </Card.Content>
       <Card.Content extra>
         <Button.Group widths={2}>
-          <Button basic color='blue' content='Edit' onClick={() => onEdit(activity.id)} />
-          <Button basic color='grey' content='Cancel' onClick={onCancel} />
+          <Button basic color='blue' content='Edit' onClick={() => openForm(activity.id)} />
+          <Button basic color='grey' content='Cancel' onClick={clearSelectedActivity} />
         </Button.Group>
       </Card.Content>
     </Card>
