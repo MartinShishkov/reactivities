@@ -1,14 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Grid } from 'semantic-ui-react';
 import ActivityList from './ActivityList';
-import ActivityDetails from '../details/ActivityDetails';
-import ActivityForm from '../form/ActivityForm';
 import { useStore } from '../../../app/stores/store';
 import { observer } from 'mobx-react-lite';
+import Loading from '../../../app/layout/Loading';
 
 const ActivityDashboard: React.FC = () => {
   const { activityStore } = useStore();
-  const { selectedActivity, editMode } = activityStore;
+  const { activityRegistry } = activityStore;
+
+  useEffect(() => {
+    if (activityRegistry.size === 0) {
+      activityStore.loadActivities();
+    }
+  }, [activityStore]);
+
+  if (activityStore.loadingInitial) {
+    return <Loading content='Loading app' />
+  }
 
   return (
     <Grid>
@@ -16,10 +25,7 @@ const ActivityDashboard: React.FC = () => {
         <ActivityList />
       </Grid.Column>
       <Grid.Column width={6}>
-        { selectedActivity && !editMode && (
-          <ActivityDetails />
-        )}
-        {editMode && <ActivityForm />}
+        <h2>activity filters</h2>
       </Grid.Column>
     </Grid>
   );

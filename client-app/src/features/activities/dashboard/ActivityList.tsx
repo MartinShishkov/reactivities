@@ -2,10 +2,11 @@ import React, { SyntheticEvent, useState } from 'react';
 import { Button, Item, Label, Segment } from 'semantic-ui-react';
 import { useStore } from '../../../app/stores/store';
 import { observer } from 'mobx-react-lite';
+import { Link } from 'react-router-dom';
 
 const ActivityList: React.FC = () => {
   const { activityStore } = useStore();
-  const { activities, loading, selectActivity, deleteActivity } = activityStore;
+  const { activities, loading, deleteActivity } = activityStore;
 
   const [target, setTarget] = useState('');
 
@@ -20,7 +21,7 @@ const ActivityList: React.FC = () => {
         {activities.map((activity) => (
           <Item key={activity.id}>
             <Item.Content>
-              <Item.Header as='a'>
+              <Item.Header as={Link} to={`/activities/${activity.id}`}>
                 {activity.title}
               </Item.Header>
               <Item.Meta>
@@ -31,7 +32,7 @@ const ActivityList: React.FC = () => {
                 <div>{activity.city}, {activity.venue}</div>
               </Item.Description>
               <Item.Extra>
-                <Button floated='right' content='View' color='blue' onClick={() => selectActivity(activity.id)} />
+                <Button as={Link} to={`/activities/${activity.id}`} floated='right' content='View' color='blue' />
                 <Button name={activity.id} loading={loading && target === activity.id} floated='right' content='Delete' color='red' onClick={(e) => handleDelete(e, activity.id)} />
                 <Label basic content={activity.category} />
               </Item.Extra>

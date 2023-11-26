@@ -19,11 +19,11 @@ export default class ActivityStore {
   }
 
   loadActivities = async () => {
+    this.setLoadingInitial(true);
     try {
       const activities = await agent.Activities.list();
       activities.forEach((activity) => {
-        activity.date = activity.date.split('T')[0];
-        this.activityRegistry.set(activity.id, activity);
+        this.setActivity(activity);
       })
       /* this.activities = activities.map((activity) => ({
         ...activity,
@@ -36,31 +36,38 @@ export default class ActivityStore {
     }
   }
 
+  loadActivity = async (id: string) => {
+    let activity = this.getActivity(id);
+    if (activity) {
+      this.selectedActivity = activity;
+    } else {
+      this.setLoadingInitial(true);
+
+      try {
+        activity = await agent.Activities.details(id);
+        this.setActivity(activity);
+        runInAction(() => {
+          this.selectedActivity = activity;
+        });
+      } catch (error) {
+        console.log('loadActivity', error);
+      } finally {
+        this.setLoadingInitial(false);
+      }
+    }
+  }
+
+  private setActivity = (activity: Activity) => {
+    activity.date = activity.date.split('T')[0];
+    this.activityRegistry.set(activity.id, activity);
+  }
+
+  private getActivity = (id: string) => {
+    return this.activityRegistry.get(id);
+  }
+
   setLoadingInitial = (state: boolean) => {
     this.loadingInitial = state;
-  }
-
-  selectActivity = (id: string) => {
-    // this.selectedActivity = this.activities.find(a => a.id === id);
-    this.selectedActivity = this.activityRegistry.get(id);
-  }
-
-  clearSelectedActivity = () => {
-    this.selectedActivity = undefined;
-  }
-
-  openForm = (id?: string) => {
-    if (id) {
-      this.selectActivity(id);
-    } else {
-      this.clearSelectedActivity();
-    }
-
-    this.editMode = true;
-  }
-
-  closeForm = () => {
-    this.editMode = false;
   }
 
   createActivity = async (activity: Activity) => {
@@ -112,10 +119,6 @@ export default class ActivityStore {
       runInAction(() => {
         // this.activities = [...this.activities.filter(a => a.id !== id)];
         this.activityRegistry.delete(id);
-
-        if (this.selectedActivity?.id === id) {
-          this.clearSelectedActivity();
-        }
       });
     } catch (error) {
       console.log(error);

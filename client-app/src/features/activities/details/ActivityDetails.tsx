@@ -1,13 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Card, Image } from 'semantic-ui-react';
 import { useStore } from '../../../app/stores/store';
+import { Link, useParams } from 'react-router-dom';
+import Loading from '../../../app/layout/Loading';
+import { observer } from 'mobx-react-lite';
 
 const ActivityDetails: React.FC = () => {
   const { activityStore } = useStore();
-  const { selectedActivity: activity, clearSelectedActivity, openForm } = activityStore;
+  const { selectedActivity: activity, loadActivity, loadingInitial } = activityStore;
+  const { id } = useParams();
 
-  if (!activity) {
-    return null;
+  useEffect(() => {
+    if (id) {
+      loadActivity(id);
+    }
+  }, [id, loadActivity]);
+
+  if (loadingInitial || !activity) {
+    return <Loading />
   }
 
   return (
@@ -24,11 +34,11 @@ const ActivityDetails: React.FC = () => {
       </Card.Content>
       <Card.Content extra>
         <Button.Group widths={2}>
-          <Button basic color='blue' content='Edit' onClick={() => openForm(activity.id)} />
-          <Button basic color='grey' content='Cancel' onClick={clearSelectedActivity} />
+          <Button as={Link} to={`/manage/${activity.id}`} basic color='blue' content='Edit' />
+          <Button as={Link} to='/activities' basic color='grey' content='Cancel' />
         </Button.Group>
       </Card.Content>
     </Card>
   );
 }
-export default ActivityDetails;
+export default observer(ActivityDetails);
