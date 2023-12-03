@@ -1,5 +1,6 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { Activity } from "../models/activity";
+import { handle400, handle401, handle403, handle404, handle500 } from "./error-handlers";
 
 const sleep = (delayMs: number) => {
   return new Promise((resolve) => {
@@ -7,16 +8,37 @@ const sleep = (delayMs: number) => {
   });
 };
 
-axios.defaults.baseURL = 'http://localhost:5000/api';
-axios.interceptors.response.use(async response => {
-  try {
-    await sleep(2000);
-    return response
-  } catch (error) {
-    console.log(error);
-    return await Promise.reject(error);
+const handleOnFulfilled = async (response: AxiosResponse<any, any>) => {
+  await sleep(2000);
+  return response
+};
+
+const handleOnRejected = (error: AxiosError) => {
+  const { status } = error.response!;
+
+  switch(status) {
+    case 400:
+      handle400(error.response!);
+      break;
+    case 401: 
+      handle401();
+      break;
+    case 403: 
+      handle403();
+      break;
+    case 404: 
+      handle404();
+      break;
+    case 500: 
+      handle500(error.response!);
+      break;
   }
-});
+
+  return Promise.reject(error);
+};
+
+axios.defaults.baseURL = 'http://localhost:5000/api';
+axios.interceptors.response.use(handleOnFulfilled, handleOnRejected);
 
 const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 

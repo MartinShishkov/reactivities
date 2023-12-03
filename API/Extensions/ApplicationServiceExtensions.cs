@@ -1,5 +1,7 @@
 ﻿using Application.Activities;
 using Application.Core;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -30,6 +32,9 @@ namespace API.Extensions
           policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
         });
       });
+
+      services.AddFluentValidationAutoValidation();
+      services.AddValidatorsFromAssemblyContaining<Create>();
 
       return services;
     }
