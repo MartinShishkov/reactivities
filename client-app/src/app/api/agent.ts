@@ -1,6 +1,8 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { Activity } from "../models/activity";
 import { handle400, handle401, handle403, handle404, handle500 } from "./error-handlers";
+import { User, UserFormValues } from "../models/user";
+import { store } from "../stores/store";
 
 const sleep = (delayMs: number) => {
   return new Promise((resolve) => {
@@ -37,7 +39,18 @@ const handleOnRejected = (error: AxiosError) => {
   return Promise.reject(error);
 };
 
+const handleAddBearerToken = (config: InternalAxiosRequestConfig) => {
+  const token = store.globalStore.token;
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+}
+
 axios.defaults.baseURL = 'http://localhost:5000/api';
+
+axios.interceptors.request.use(handleAddBearerToken);
 axios.interceptors.response.use(handleOnFulfilled, handleOnRejected);
 
 const responseBody = <T>(response: AxiosResponse<T>) => response.data;
@@ -57,8 +70,15 @@ const Activities = {
   delete: (id: string) => axios.delete<void>(`/activities/${id}`)
 };
 
+const Account = {
+  current: () => requests.get<User>('/account'),
+  login: (user: UserFormValues) => requests.post<User>('/account/login', user),
+  register: (user: UserFormValues) => requests.post<User>('/account/register', user),
+};
+
 const agent = {
-  Activities
+  Activities,
+  Account
 };
 
 export default agent;

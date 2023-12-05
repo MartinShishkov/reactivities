@@ -50,7 +50,8 @@ namespace API.Controllers
 
       if (existingUser)
       {
-        return BadRequest("Username is already taken");
+        ModelState.AddModelError("Username", "Username is already taken");
+        return ValidationProblem();
       }
 
       var user = new AppUser

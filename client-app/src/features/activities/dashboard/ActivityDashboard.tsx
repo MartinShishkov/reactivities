@@ -17,7 +17,7 @@ const ActivityDashboard: React.FC = () => {
   }, [activityStore]);
 
   if (activityStore.loadingInitial) {
-    return <Loading content='Loading app' />
+    return <Loading content='Loading activities...' />
   }
 
   return (
