@@ -25,7 +25,9 @@ namespace API.Controllers
     [HttpPost("login")]
     public async Task<ActionResult<UserDto>> Login(LoginDto login)
     {
-      var user = await userManager.FindByEmailAsync(login.Email);
+      var user = await userManager.Users
+        .Include(u => u.Images)
+        .FirstOrDefaultAsync(x => x.Email == login.Email);
 
       if (user == null)
       {
@@ -75,7 +77,9 @@ namespace API.Controllers
     public async Task<ActionResult<UserDto>> GetCurrentUser()
     {
       var emailFromClaim = User.FindFirstValue(ClaimTypes.Email);
-      var user = await userManager.FindByEmailAsync(emailFromClaim);
+      var user = await userManager.Users
+        .Include(u => u.Images)
+        .FirstOrDefaultAsync(x => x.Email == emailFromClaim);
 
       return CreateUserObjectFromAppUser(user);
     }
@@ -85,7 +89,7 @@ namespace API.Controllers
       return new UserDto
       {
         DisplayName = user.DisplayName,
-        Image = null,
+        Image = user?.Images?.FirstOrDefault(i => i.IsMain)?.Url,
         Token = tokenService.CreateToken(user),
         Username = user.UserName,
       };

@@ -22,6 +22,6 @@ namespace Application.Activities
 
     public string HostUsername { get; set; }
 
-    public ICollection<ProfileDto> Attendees { get; set; }
+    public ICollection<AttendeeDto> Attendees { get; set; }
   }
 }

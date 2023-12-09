@@ -10,5 +10,7 @@ namespace Application.Domain
     public string Bio { get; set; }
 
     public ICollection<ActivityAttendee> Activities { get; set; }
+
+    public ICollection<Image> Images { get; set; }
   }
 }

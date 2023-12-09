@@ -1,4 +1,5 @@
 ﻿using Application.Activities;
+using Application.Domain;
 using Application.Profiles;
 using AutoMapper;
 using Domain;
@@ -13,10 +14,14 @@ namespace Application.Core
       CreateMap<Activity, ActivityDto>()
         .ForMember(d => d.HostUsername, o => o.MapFrom(s => s.Attendees.FirstOrDefault(x => x.IsHost).AppUser.UserName));
 
-      CreateMap<ActivityAttendee, ProfileDto>()
+      CreateMap<ActivityAttendee, AttendeeDto>()
         .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.AppUser.DisplayName))
         .ForMember(d => d.Username, o => o.MapFrom(s => s.AppUser.UserName))
+        .ForMember(d => d.Image, o => o.MapFrom(s => s.AppUser.Images.FirstOrDefault(x => x.IsMain).Url))
         .ForMember(d => d.Bio, o => o.MapFrom(s => s.AppUser.Bio));
+
+      CreateMap<AppUser, ProfileDto>()
+        .ForMember(d => d.Image, o => o.MapFrom(s => s.Images.FirstOrDefault(x => x.IsMain).Url));
     }
   }
 }
