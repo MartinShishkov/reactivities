@@ -20,7 +20,7 @@ namespace Application.Activities
 
     public bool IsCancelled { get; set; }
 
-    public string HostUsernamme { get; set; }
+    public string HostUsername { get; set; }
 
     public ICollection<ProfileDto> Attendees { get; set; }
   }
